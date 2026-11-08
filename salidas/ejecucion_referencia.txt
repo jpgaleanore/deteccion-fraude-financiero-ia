@@ -1,0 +1,77 @@
+
+──────────────────────────────────────────────────────────────────────────────
+1. DATOS
+──────────────────────────────────────────────────────────────────────────────
+Generadas 60,000 transacciones sintéticas (semilla 42).
+Fraudes reales: 300 de 60,000 (0.50%) → dataset desbalanceado.
+tipo_fraude
+toma_de_cuenta     83
+card_testing       83
+tarjeta_clonada    76
+fraude_sutil       58
+
+Entrenamiento: 48,000 transacciones · Operación (días recientes): 12,000
+
+──────────────────────────────────────────────────────────────────────────────
+2. ENTRENAMIENTO NO SUPERVISADO (sin etiquetas)
+──────────────────────────────────────────────────────────────────────────────
+Isolation Forest  entrenado en  0.72 s · umbral ALTO (revisa el 1.0% más anómalo) = 0.9900
+Autoencoder       entrenado en  1.64 s · umbral ALTO (revisa el 1.0% más anómalo) = 0.9900
+
+──────────────────────────────────────────────────────────────────────────────
+3. EVALUACIÓN SOBRE OPERACIÓN (la etiqueta solo se usa para medir)
+──────────────────────────────────────────────────────────────────────────────
+                  auc_roc  auc_pr  precision  recall      f1  verdaderos_positivos  falsos_positivos  falsos_negativos  segundos_entrenamiento
+modelo                                                                                                                                        
+Isolation Forest   0.9942  0.8279     0.3387    0.84  0.4828                    42                82                 8                    0.72
+Autoencoder        0.9800  0.6141     0.3276    0.76  0.4578                    38                78                12                    1.64
+
+Lectura: AUC-PR es la métrica honesta con 0,5 % de fraude (el azar daría ≈ 0.004). Los falsos positivos son clientes legítimos que recibirían una alerta: ese es el costo ético.
+
+Modelo principal elegido: Isolation Forest (mayor AUC-PR).
+
+Recall por patrón de fraude · Isolation Forest:
+                 detectados  total  recall
+tipo_fraude                               
+card_testing             12     12   1.000
+fraude_sutil              1      9   0.111
+tarjeta_clonada          13     13   1.000
+toma_de_cuenta           16     16   1.000
+
+Gráficos guardados: 01_desbalance.png, 02_puntuaciones.png, 03_precision_recall.png, 04_matriz_confusion.png
+
+──────────────────────────────────────────────────────────────────────────────
+4. SISTEMA DE ALERTAS CON NIVELES Y REVISIÓN HUMANA
+──────────────────────────────────────────────────────────────────────────────
+Umbral MEDIO = 0.9700 (verificación OTP) · Umbral ALTO = 0.9900 (analista humano)
+
+Transacciones procesadas: 12,000
+  BAJO    11,650  → aprobada
+  MEDIO      226  → aprobada + OTP al cliente
+  ALTO       124  → retenida + analista humano
+
+Nivel asignado vs. realidad (0 = legítima, 1 = fraude):
+es_fraude      0   1
+nivel               
+BAJO       11645   5
+MEDIO        223   3
+ALTO          82  42
+
+Propuestas de bloqueo de cuenta (siempre sujetas a confirmación humana): 3
+Alertas: /Users/jp/Documents/u/inteligenciaArtificial/salidas/alertas.csv
+Bitácora completa: /Users/jp/Documents/u/inteligenciaArtificial/salidas/bitacora_decisiones.csv
+
+Ejemplo de alertas ALTAS explicadas:
+  · TX0048078 cliente 1126 · $17,148 COP · score 0.997
+    motivos: distancia a la ubicación habitual muy alto (5,980); transacción fuera del país muy alto (1); intentos fallidos de PIN/OTP muy alto (2)
+    acción: Retener transacción, avisar al cliente y escalar a analista humano (SLA 2 h)
+  · TX0048120 cliente 1314 · $39,159 COP · score 0.991
+    motivos: distancia a la ubicación habitual muy alto (5,968); transacción fuera del país muy alto (1); hora del día muy bajo (9)
+    acción: Retener transacción, avisar al cliente y escalar a analista humano (SLA 2 h)
+  · TX0048127 cliente 1473 · $1,359,544 COP · score 0.993
+    motivos: monto frente al promedio del cliente muy alto (15.2); monto de la transacción muy alto (1,359,544); canal de la transacción muy alto (3)
+    acción: Retener transacción, avisar al cliente y escalar a analista humano (SLA 2 h)
+
+──────────────────────────────────────────────────────────────────────────────
+FIN · Resultados en /Users/jp/Documents/u/inteligenciaArtificial/salidas
+──────────────────────────────────────────────────────────────────────────────
