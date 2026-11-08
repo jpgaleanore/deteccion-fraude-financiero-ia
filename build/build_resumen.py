@@ -78,7 +78,7 @@ p("RESUMEN EJECUTIVO", bold=True, size=9, color=VERDE, after=0)
 p("Detección de fraude financiero y bloqueo responsable de cuentas", bold=True, size=16, color=AZUL, after=0)
 p("Aprendizaje de máquina no supervisado (Isolation Forest y Autoencoder) integrado con un sistema de alertas con supervisión humana · Inspiración: Ozark",
   italic=True, size=9.5, color=GRIS, after=1)
-p(f"{CURSO}\n{INTEGRANTES}", size=8.5, color=GRIS, after=4)
+p(f"{CURSO}\n{INTEGRANTES}\nCódigo fuente: https://github.com/jpgaleanore/deteccion-fraude-financiero-ia", size=8.5, color=GRIS, after=4)
 
 # ---- 1. Problema -------------------------------------------------------------------------------
 h("1. Problema")

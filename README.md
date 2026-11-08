@@ -6,6 +6,7 @@ Autoencoder en Python) integrado con un sistema de alertas por niveles con super
 
 Integrantes: Juan Pablo Galeano Restrepo, David Gómez Jiménez y David Sánchez Tabares.
 Tarea en el campus: https://campus.ucatolicaluisamigo.edu.co/mod/assign/view.php?id=46277
+Repositorio del código: https://github.com/jpgaleanore/deteccion-fraude-financiero-ia
 **Cierre en el campus: lunes 9 de noviembre de 2026, 12:00 m.** (la guía además pedía evidencia
 en el repositorio desde el 6 de noviembre: subir cuanto antes).
 
