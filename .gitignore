@@ -1,8 +1,13 @@
-# Solo se versiona codigo/ y el README. El resto son entregables locales del campus.
+# Se versiona solo el paquete, las pruebas y la configuración del proyecto.
+# El resto (documentos de la entrega, salidas, entorno) es local.
 /*
-!/codigo/
+!/deteccion_fraude/
+!/tests/
 !/README.md
+!/requirements.txt
+!/pyproject.toml
 !/.gitignore
 __pycache__/
 *.pyc
+*.egg-info/
 .DS_Store

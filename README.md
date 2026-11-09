@@ -12,34 +12,41 @@ Prototipo en Python que identifica transacciones bancarias sospechosas en un con
 
 ## Cómo ejecutarlo
 
-Requiere Python 3.10 o superior.
+Requiere Python 3.10 o superior. Desde la raíz del proyecto:
 
 ```bash
-cd codigo
 python3 -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python main.py                                       # entrena, evalúa y genera las alertas
+python -m deteccion_fraude                           # entrena, evalúa y genera las alertas en ./salidas
 ```
 
 Otros modos:
 
 ```bash
-python main.py --demo --demo-n 20 --pausa 0.8 --sin-graficos   # simula transacciones llegando en vivo
-python main.py --modelo iforest                                 # solo Isolation Forest
-python main.py --csv creditcard.csv                             # usar el dataset de Kaggle
-python -m unittest test_basico -v                               # pruebas
+python -m deteccion_fraude --demo --demo-n 20 --pausa 0.8 --sin-graficos   # simula transacciones llegando en vivo
+python -m deteccion_fraude --modelo iforest                                 # solo Isolation Forest
+python -m deteccion_fraude --csv creditcard.csv                             # usar el dataset de Kaggle
+python -m deteccion_fraude --salidas resultados                             # otra carpeta de salida
+python -m unittest discover -s tests -v                                     # pruebas
 ```
 
 Opciones: `--n` (cantidad de transacciones), `--fraude` (proporción de fraude), `--presupuesto` (fracción revisada por analistas, define el nivel ALTO), `--presupuesto-medio` (fracción con OTP), `--semilla`.
 
+También puede instalarse como paquete (`pip install -e .`), lo que deja disponible el comando `detectar-fraude` con las mismas opciones.
+
 ## Estructura
 
 ```
-codigo/
-├── main.py         pipeline completo y modo --demo
-├── datos.py        generación / carga de transacciones
-├── modelo.py       Isolation Forest y Autoencoder
-├── evaluacion.py   métricas y gráficos
-├── alertas.py      niveles de alerta, explicaciones y bitácora
-└── test_basico.py  pruebas unitarias
+.
+├── deteccion_fraude/       paquete principal
+│   ├── __main__.py         permite `python -m deteccion_fraude`
+│   ├── main.py             pipeline completo y modo --demo
+│   ├── datos.py            generación / carga de transacciones
+│   ├── modelo.py           Isolation Forest y Autoencoder
+│   ├── evaluacion.py       métricas y gráficos
+│   └── alertas.py          niveles de alerta, explicaciones y bitácora
+├── tests/
+│   └── test_basico.py      pruebas unitarias
+├── pyproject.toml          metadatos e instalación del paquete
+└── requirements.txt        dependencias
 ```

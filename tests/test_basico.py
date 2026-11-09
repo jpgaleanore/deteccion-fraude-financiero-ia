@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Pruebas rápidas: python -m unittest test_basico -v"""
+"""Pruebas (desde la raíz del proyecto): python -m unittest discover -s tests -v"""
 import unittest
 
 import numpy as np
 
-from alertas import SistemaAlertas, Umbrales
-from datos import COLUMNAS_MODELO, generar_transacciones
-from evaluacion import evaluar, umbral_por_presupuesto
-from modelo import DetectorAutoencoder, DetectorIsolationForest
+from deteccion_fraude.alertas import SistemaAlertas, Umbrales
+from deteccion_fraude.datos import COLUMNAS_MODELO, generar_transacciones
+from deteccion_fraude.evaluacion import evaluar, umbral_por_presupuesto
+from deteccion_fraude.modelo import DetectorAutoencoder, DetectorIsolationForest
 
 
 class PruebasFraude(unittest.TestCase):

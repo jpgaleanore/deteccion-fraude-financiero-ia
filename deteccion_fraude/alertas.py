@@ -33,7 +33,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from datos import NOMBRES_LEGIBLES
+from .datos import NOMBRES_LEGIBLES
 
 ACCIONES = {
     "BAJO": "Aprobar y registrar",

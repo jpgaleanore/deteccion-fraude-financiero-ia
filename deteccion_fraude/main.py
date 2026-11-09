@@ -15,12 +15,12 @@ Flujo (modo normal):
        niveles (BAJO / MEDIO / ALTO) y supervisión humana.
     6. Guardar métricas, gráficos, alertas y bitácora en ../salidas/.
 
-Uso:
-    python main.py                      # ejecución completa
-    python main.py --demo               # simula transacciones llegando en vivo (para el video)
-    python main.py --modelo iforest     # solo Isolation Forest
-    python main.py --csv creditcard.csv # usar el dataset público de Kaggle
-    python main.py --ayuda-rapida       # resumen de opciones
+Uso (desde la raíz del proyecto):
+    python -m deteccion_fraude                      # ejecución completa
+    python -m deteccion_fraude --demo               # simula transacciones llegando en vivo (para el video)
+    python -m deteccion_fraude --modelo iforest     # solo Isolation Forest
+    python -m deteccion_fraude --csv creditcard.csv # usar el dataset público de Kaggle
+    python -m deteccion_fraude --salidas resultados # cambiar la carpeta de salida
 """
 from __future__ import annotations
 
@@ -33,13 +33,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from alertas import SistemaAlertas, Umbrales
-from datos import COLUMNAS_MODELO, cargar_csv, generar_transacciones
-from evaluacion import evaluar, graficar, recall_por_tipo, tabla_resultados, umbral_por_presupuesto
-from modelo import crear_detector
+from .alertas import SistemaAlertas, Umbrales
+from .datos import COLUMNAS_MODELO, cargar_csv, generar_transacciones
+from .evaluacion import evaluar, graficar, recall_por_tipo, tabla_resultados, umbral_por_presupuesto
+from .modelo import crear_detector
 
 warnings.filterwarnings("ignore")  # avisos de convergencia del autoencoder no aportan al usuario
-SALIDAS = Path(__file__).resolve().parent.parent / "salidas"
 LINEA = "─" * 78
 
 
@@ -58,6 +57,8 @@ def argumentos() -> argparse.Namespace:
                    help="fracción de transacciones que el equipo puede revisar (nivel ALTO). Defecto 1 %%")
     p.add_argument("--presupuesto-medio", type=float, default=0.03,
                    help="fracción que recibe verificación OTP (nivel MEDIO). Defecto 3 %%")
+    p.add_argument("--salidas", type=Path, default=Path("salidas"),
+                   help="carpeta de resultados (defecto ./salidas)")
     p.add_argument("--sin-graficos", action="store_true")
     p.add_argument("--demo", action="store_true", help="simula la llegada de transacciones en vivo")
     p.add_argument("--demo-n", type=int, default=40, help="transacciones a mostrar en el modo demo")
@@ -83,6 +84,7 @@ def dividir(df: pd.DataFrame, frac_entrenamiento: float = 0.8) -> tuple[pd.DataF
 
 def main() -> int:
     args = argumentos()
+    SALIDAS = args.salidas.resolve()
     titulo("1. DATOS")
     df, columnas = cargar(args)
     n_fraude = int(df["es_fraude"].sum())
