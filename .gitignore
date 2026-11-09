@@ -8,3 +8,4 @@ build/*.pdf
 *.zip
 salidas/alertas.csv
 salidas/bitacora_decisiones.csv
+NOTAS_ENTREGA.md
