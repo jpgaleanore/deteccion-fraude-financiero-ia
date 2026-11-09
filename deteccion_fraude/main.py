@@ -21,6 +21,9 @@ Uso (desde la raíz del proyecto):
     python -m deteccion_fraude --modelo iforest     # solo Isolation Forest
     python -m deteccion_fraude --csv creditcard.csv # usar el dataset público de Kaggle
     python -m deteccion_fraude --salidas resultados # cambiar la carpeta de salida
+    python -m deteccion_fraude --guardar-modelo salidas/modelo_fraude.pkl
+    python -m deteccion_fraude --cargar-modelo salidas/modelo_fraude.pkl \
+        --transaccion "monto=5900000,hora=1,pin=4,dispositivo=1"   # decisión sobre una entrada propia
 """
 from __future__ import annotations
 
@@ -34,6 +37,7 @@ import numpy as np
 import pandas as pd
 
 from .alertas import SistemaAlertas, Umbrales
+from .decision import DecisorFraude, transaccion_desde_texto
 from .datos import COLUMNAS_MODELO, cargar_csv, generar_transacciones
 from .evaluacion import evaluar, graficar, recall_por_tipo, tabla_resultados, umbral_por_presupuesto
 from .modelo import crear_detector
@@ -61,6 +65,15 @@ def argumentos() -> argparse.Namespace:
                    help="carpeta de resultados (defecto ./salidas)")
     p.add_argument("--sin-graficos", action="store_true")
     p.add_argument("--demo", action="store_true", help="simula la llegada de transacciones en vivo")
+    p.add_argument("--guardar-modelo", type=Path, default=None, metavar="RUTA",
+                   help="guarda el modelo entrenado y sus umbrales (p. ej. salidas/modelo_fraude.pkl)")
+    p.add_argument("--cargar-modelo", type=Path, default=None, metavar="RUTA",
+                   help="usa un modelo ya guardado en vez de entrenar")
+    p.add_argument("--transaccion", action="append", default=[], metavar="VARS",
+                   help='decide sobre una transacción escrita a mano, p. ej. "monto=5900000,hora=1,pin=4,dispositivo=1". '
+                        "Se puede repetir. Variables no indicadas toman valores típicos.")
+    p.add_argument("--decidir-csv", type=Path, default=None, metavar="ARCHIVO",
+                   help="decide sobre todas las transacciones de un CSV con las 11 columnas del modelo")
     p.add_argument("--demo-n", type=int, default=40, help="transacciones a mostrar en el modo demo")
     p.add_argument("--pausa", type=float, default=0.35, help="segundos entre transacciones en demo")
     return p.parse_args()
@@ -85,6 +98,10 @@ def dividir(df: pd.DataFrame, frac_entrenamiento: float = 0.8) -> tuple[pd.DataF
 def main() -> int:
     args = argumentos()
     SALIDAS = args.salidas.resolve()
+    if args.cargar_modelo and (args.transaccion or args.decidir_csv):
+        decisor = DecisorFraude.cargar(args.cargar_modelo)
+        print(f"Modelo cargado de {args.cargar_modelo} ({decisor.detector.nombre}) · sin reentrenar.")
+        return decidir_entradas(decisor, args, SALIDAS)
     titulo("1. DATOS")
     df, columnas = cargar(args)
     n_fraude = int(df["es_fraude"].sum())
@@ -136,6 +153,12 @@ def main() -> int:
     umb = Umbrales.desde_presupuesto(scores_entren[mejor], args.presupuesto_medio, args.presupuesto)
     sistema = SistemaAlertas(umb, columnas, referencia=entren[entren["es_fraude"] == 0] if "es_fraude" in entren else entren)
     print(f"Umbral MEDIO = {umb.medio:.4f} (verificación OTP) · Umbral ALTO = {umb.alto:.4f} (analista humano)")
+    decisor = DecisorFraude(detectores[mejor], umb, sistema, columnas)
+    if args.guardar_modelo:
+        ruta = decisor.guardar(args.guardar_modelo)
+        print(f"Modelo guardado en {ruta} (detector, escalador, umbrales y sistema de alertas).")
+    if args.transaccion or args.decidir_csv:
+        return decidir_entradas(decisor, args, SALIDAS)
 
     if args.demo:
         demo_en_vivo(oper, scores_oper[mejor], sistema, args.demo_n, args.pausa)
@@ -164,6 +187,31 @@ def main() -> int:
             print(f"  · {a['tx_id']} cliente {a['cliente_id']} · ${a['monto']:,.0f} COP · score {a['score']:.3f}\n"
                   f"    motivos: {a['motivos']}\n    acción: {a['accion']}")
     titulo("FIN · Resultados en " + str(SALIDAS))
+    return 0
+
+
+def decidir_entradas(decisor: DecisorFraude, args: argparse.Namespace, salidas: Path) -> int:
+    """Decide sobre las transacciones dadas con --transaccion y/o --decidir-csv."""
+    titulo("DECISIÓN SOBRE TRANSACCIONES NUEVAS")
+    print(f"Umbral MEDIO = {decisor.umbrales.medio:.4f} · Umbral ALTO = {decisor.umbrales.alto:.4f}\n")
+    for i, texto in enumerate(args.transaccion, start=1):
+        tx = transaccion_desde_texto(texto)
+        reg = decisor.decidir(tx, tx_id=f"MANUAL{i:02d}")
+        c = COLOR[reg["nivel"]]
+        print(f"Transacción {i}: " + ", ".join(f"{k}={v:g}" for k, v in tx.items()))
+        print(f"  score {reg['score']:.4f} → nivel {c}{reg['nivel']}{COLOR['fin']} · {ACCION_CORTA[reg['nivel']]}")
+        if reg["motivos"]:
+            print(f"  motivos: {reg['motivos']}")
+        print(f"  acción: {reg['accion']}\n")
+    if args.decidir_csv:
+        df = pd.read_csv(args.decidir_csv)
+        res = decisor.decidir_lote(df)
+        salidas.mkdir(parents=True, exist_ok=True)
+        ruta = salidas / "decisiones_csv.csv"
+        res.to_csv(ruta, index=False)
+        print(f"{len(res):,} transacciones de {args.decidir_csv} decididas:")
+        print(res["nivel"].value_counts().reindex(["BAJO", "MEDIO", "ALTO"]).fillna(0).astype(int).to_string())
+        print(f"Detalle en {ruta}")
     return 0
 
 

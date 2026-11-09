@@ -30,6 +30,24 @@ python -m deteccion_fraude --salidas resultados                             # ot
 python -m unittest discover -s tests -v                                     # pruebas
 ```
 
+### Pedirle una decisión al modelo entrenado
+
+```bash
+# 1. Entrenar una vez y guardar el modelo (detector, escalador, umbrales y sistema de alertas)
+python -m deteccion_fraude --guardar-modelo salidas/modelo_fraude.pkl
+
+# 2. Decidir sobre transacciones propias sin volver a entrenar
+python -m deteccion_fraude --cargar-modelo salidas/modelo_fraude.pkl \
+    --transaccion "monto=5900000,hora=1,pin=4,dispositivo=1" \
+    --transaccion "monto=45000,hora=13" \
+    --transaccion "monto=300000,pais=1,distancia=2500,comercio=1"
+
+# 3. O decidir sobre un CSV completo con las 11 columnas del modelo
+python -m deteccion_fraude --cargar-modelo salidas/modelo_fraude.pkl --decidir-csv nuevas.csv
+```
+
+Cada transacción devuelve su puntuación, el nivel (BAJO / MEDIO / ALTO), los motivos y la acción. Variables aceptadas: `monto, hora, fin_de_semana, distancia_km, tx_ultima_hora, ratio_monto, pais_distinto, dispositivo_nuevo, comercio_nuevo, intentos_pin, canal` (con atajos `pin`, `pais`, `dispositivo`, `comercio`, `distancia`, `velocidad`, `ratio`, `finde`). Las que no se indiquen toman el valor de una compra típica.
+
 Opciones: `--n` (cantidad de transacciones), `--fraude` (proporción de fraude), `--presupuesto` (fracción revisada por analistas, define el nivel ALTO), `--presupuesto-medio` (fracción con OTP), `--semilla`.
 
 También puede instalarse como paquete (`pip install -e .`), lo que deja disponible el comando `detectar-fraude` con las mismas opciones.
@@ -44,7 +62,7 @@ También puede instalarse como paquete (`pip install -e .`), lo que deja disponi
 │   ├── datos.py            generación / carga de transacciones
 │   ├── modelo.py           Isolation Forest y Autoencoder
 │   ├── evaluacion.py       métricas y gráficos
-│   └── alertas.py          niveles de alerta, explicaciones y bitácora
+│   ├── alertas.py          niveles de alerta, explicaciones y bitácora
 ├── tests/
 │   └── test_basico.py      pruebas unitarias
 ├── pyproject.toml          metadatos e instalación del paquete
