@@ -1,1 +1,0 @@
-{ "name": "build-ia", "private": true, "type": "commonjs", "dependencies": { "pptxgenjs": "^4.0.1" } }

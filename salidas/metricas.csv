@@ -1,3 +1,0 @@
-modelo,umbral,auc_roc,auc_pr,precision,recall,f1,verdaderos_positivos,falsos_positivos,falsos_negativos,verdaderos_negativos,segundos_entrenamiento
-Isolation Forest,0.99,0.9942,0.8279,0.3387,0.84,0.4828,42,82,8,11868,0.75
-Autoencoder,0.99,0.98,0.6141,0.3276,0.76,0.4578,38,78,12,11872,1.66

@@ -1,11 +1,8 @@
-.venv/
+# Solo se versiona codigo/ y el README. El resto son entregables locales del campus.
+/*
+!/codigo/
+!/README.md
+!/.gitignore
 __pycache__/
 *.pyc
 .DS_Store
-~$*
-build/node_modules
-build/*.pdf
-*.zip
-salidas/alertas.csv
-salidas/bitacora_decisiones.csv
-NOTAS_ENTREGA.md
