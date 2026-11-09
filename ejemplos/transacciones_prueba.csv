@@ -1,0 +1,16 @@
+tx_id,cliente_id,descripcion,monto,hora,fin_de_semana,distancia_km,tx_ultima_hora,ratio_monto,pais_distinto,dispositivo_nuevo,comercio_nuevo,intentos_pin,canal
+P01,1001,Supermercado habitual al mediodia,85000,12,0,2.5,0,0.95,0,0,0,0,0
+P02,1002,Cafe cerca de casa por app,12000,8,0,1.2,1,0.15,0,0,0,0,1
+P03,1003,Gasolina fin de semana,120000,10,1,8.0,0,1.3,0,0,0,0,0
+P04,1004,Compra online en comercio nuevo,210000,20,0,4.0,0,2.1,0,0,1,0,2
+P05,1005,Retiro en cajero habitual,400000,17,0,3.0,0,3.2,0,0,0,0,3
+P06,1006,Viajero comprando en Madrid,350000,15,0,8100.0,1,2.8,1,0,1,0,0
+P07,1007,Televisor en almacen de cadena,2800000,16,1,6.0,0,9.5,0,0,0,0,0
+P08,1008,Transferencia grande madrugada celular nuevo varios OTP,5900000,1,0,45.0,3,47.0,0,1,1,4,1
+P09,1009,Card testing micro-cobros web dispositivo nuevo,4500,3,0,30.0,18,0.05,0,1,1,2,2
+P10,1010,Tarjeta clonada compra presencial en otro pais,900000,22,0,4200.0,2,7.5,1,0,1,1,0
+P11,1011,Toma de cuenta compra web 2am dispositivo nuevo,1500000,2,1,120.0,2,12.0,0,1,1,3,2
+P12,1012,Fraude sutil monto normal comercio nuevo dispositivo nuevo,95000,15,0,10.0,2,1.1,0,1,1,1,1
+P13,1013,Remesa recibida y gastada en otra ciudad,650000,19,0,420.0,1,5.0,0,0,1,0,3
+P14,1014,Pago de matricula universitaria,3200000,9,0,5.0,0,12.0,0,0,1,0,2
+P15,1015,Varios intentos de PIN en cajero monto pequeno,60000,21,0,2.0,1,0.6,0,0,0,3,3

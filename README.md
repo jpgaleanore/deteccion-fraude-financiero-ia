@@ -42,8 +42,8 @@ python -m deteccion_fraude --cargar-modelo salidas/modelo_fraude.pkl \
     --transaccion "monto=45000,hora=13" \
     --transaccion "monto=300000,pais=1,distancia=2500,comercio=1"
 
-# 3. O decidir sobre un CSV completo con las 11 columnas del modelo
-python -m deteccion_fraude --cargar-modelo salidas/modelo_fraude.pkl --decidir-csv nuevas.csv
+# 3. O decidir sobre un CSV completo con las 11 columnas del modelo (hay uno de ejemplo con 15 casos)
+python -m deteccion_fraude --cargar-modelo salidas/modelo_fraude.pkl --decidir-csv ejemplos/transacciones_prueba.csv
 ```
 
 Cada transacción devuelve su puntuación, el nivel (BAJO / MEDIO / ALTO), los motivos y la acción. Variables aceptadas: `monto, hora, fin_de_semana, distancia_km, tx_ultima_hora, ratio_monto, pais_distinto, dispositivo_nuevo, comercio_nuevo, intentos_pin, canal` (con atajos `pin`, `pais`, `dispositivo`, `comercio`, `distancia`, `velocidad`, `ratio`, `finde`). Las que no se indiquen toman el valor de una compra típica.
@@ -65,6 +65,8 @@ También puede instalarse como paquete (`pip install -e .`), lo que deja disponi
 │   ├── alertas.py          niveles de alerta, explicaciones y bitácora
 ├── tests/
 │   └── test_basico.py      pruebas unitarias
+├── ejemplos/
+│   └── transacciones_prueba.csv   15 transacciones de entrada para probar decisiones
 ├── pyproject.toml          metadatos e instalación del paquete
 └── requirements.txt        dependencias
 ```
